@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 for l in range(10):
     for k in range(l, 10):
         if l < k:
