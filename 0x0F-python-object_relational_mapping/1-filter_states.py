@@ -1,24 +1,19 @@
 #!/usr/bin/python3
-"""script for use in getting all states from sql db
-"""
+"""filter dem boys"""
+
+
 import MySQLdb
-import sys
+from sys import argv
 
 
-if __name__ == '__main__':
-    args = sys.argv
-    username = args[1]
-    password = args[2]
-    data = args[3]
-    db = MySQLdb.connect(host='localhost', user=username,
-                         passwd=password, db=data,
-                         port=3306)
-    cur = db.cursor()
-    num_rows = cur.execute('''
-            SELECT * FROM states
-            WHERE states.name LIKE 'N%'
-            ORDER BY states.id
-            ''')
-    rows = cur.fetchall()
+if __name__ == "__main__":
+    database = MySQLdb.connect(user=argv[1],
+                               passwd=argv[2],
+                               db=argv[3])
+    curs = database.cursor()
+    curs.execute('SELECT * FROM `states` WHERE `name` LIKE BINARY "N%%";')
+    rows = curs.fetchall()
     for row in rows:
         print(row)
+    curs.close()
+    database.close()
