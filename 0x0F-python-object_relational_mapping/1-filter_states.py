@@ -1,29 +1,24 @@
 #!/usr/bin/python3
+"""script for use in getting all states from sql db
+"""
+import MySQLdb
+import sys
 
 
-def getAllStates(user2, passward2, db2):
-    """ script that gets all the states when called on """
-    import MySQLdb
-    conn = MySQLdb.connect(
-            host="localhost",
-            port=3306,
-            user=user2,
-            passwd=passward2,
-            db=db2,
-            charset="utf8")
-    cur = conn.cursor()
-    cur.execute(
-        "SELECT * FROM states WHERE name LIKE BINARY 'N%' ORDER BY id ASC")
+if __name__ == '__main__':
+    args = sys.argv
+    username = args[1]
+    password = args[2]
+    data = args[3]
+    db = MySQLdb.connect(host='localhost', user=username,
+                         passwd=password, db=data,
+                         port=3306)
+    cur = db.cursor()
+    num_rows = cur.execute('''
+            SELECT * FROM states
+            WHERE states.name LIKE 'N%'
+            ORDER BY states.id
+            ''')
     rows = cur.fetchall()
     for row in rows:
         print(row)
-    cur.close()
-    conn.close()
-    # engine = sqlalchemy.create_engine()
-    # db = MySQLdb.connect(host=MY_HOST, user=MY_USER, db=MY_DB)
-    # cur = db.cursor()
-
-if __name__ == "__main__":
-    import sys
-    """ protected from executing when imported """
-    getAllStates(sys.argv[1], sys.argv[2], sys.argv[3])
