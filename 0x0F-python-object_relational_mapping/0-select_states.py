@@ -1,28 +1,20 @@
 #!/usr/bin/python3
+"""
+script that lists all states from the database
+"""
+import MySQLdb
+import sys
 
-
-def getAllStates(user2, passward2, db2):
-    """ script that gets all the states when called on """
-    import MySQLdb
-    conn = MySQLdb.connect(
-            host="localhost",
-            port=3306,
-            user=user2,
-            passwd=passward2,
-            db=db2,
-            charset="utf8")
-    cur = conn.cursor()
-    cur.execute("SELECT * FROM states ORDER BY id ASC")
+if __name__ == "__main__":
+    username = sys.argv[1]
+    pas = sys.argv[2]
+    dbn = sys.argv[3]
+    db = MySQLdb.connect(host="localhost", port=3306, user=username,
+                         passwd=pas, db=dbn)
+    cur = db.cursor()
+    cur.execute("SELECT * FROM states ORDER BY states.id")
     rows = cur.fetchall()
     for row in rows:
         print(row)
     cur.close()
-    conn.close()
-    # engine = sqlalchemy.create_engine()
-    # db = MySQLdb.connect(host=MY_HOST, user=MY_USER, db=MY_DB)
-    # cur = db.cursor()
-
-if __name__ == "__main__":
-    import sys
-    """ protected from executing when imported """
-    getAllStates(sys.argv[1], sys.argv[2], sys.argv[3])
+    db.close()
