@@ -1,32 +1,40 @@
 #!/usr/bin/node
+
 const request = require('request');
-request(process.argv[2], function (error, response, body) {
-  if (error) {
-    console.log(error);
-  } else {
-    let data = JSON.parse(body);
+const argv = process.argv;
+const newDict = {};
+// const url = 'http://swapi.co/api/films/';
+function getJson (theUrl) {
+  const options = {
+    url: theUrl,
+    method: 'GET',
+    headers: {
+      Accept: 'application/json',
+      'Accept-Charset': 'utf-8'
+    }
+  };
+  request(options, function (err, res, body) {
+    if (err) {
+      console.log(err);
+    } else {
+      const json = JSON.parse(body);
+      // const json = JSON.parse(body);
+      // const status = res.statusCode;
 
-    let dict = {};
-    for (let i = 0; i < data.length; i++) {
-      let user = data[i];
+      for (const key in json) {
+        const value = json[key].userId;
 
-      if (user.completed === true) {
-        if (user.userId in dict) {
-          dict[user.userId] += 1;
-        } else {
-          dict[user.userId] = 1;
+        if (json[key].completed) {
+          if (newDict[value]) {
+            newDict[value] += 1;
+          } else {
+            newDict[value] = 1;
+          }
         }
       }
-
-      /*
-if (dict[user.userId] === undefined) {
-dict[user.userId] = 0;
-}
-if (user.completed === true) {
-dict[user.userId]++;
-}
-*/
+      console.log(newDict);
     }
-    console.log(dict);
-  }
-});
+  });
+}
+
+getJson(argv[2]);

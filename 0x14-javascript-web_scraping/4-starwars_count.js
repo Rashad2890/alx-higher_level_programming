@@ -1,39 +1,41 @@
 #!/usr/bin/node
+
 const request = require('request');
-const fake = process.argv[2];
-request(fake, function (error, response, body) {
-  let charId = /18/;
-  let count = 0;
-  if (error) {
-    console.log(error);
-  } else {
-    const val = JSON.parse(body);
-    // console.log(val);
-    let results = val.results;
-    // console.log(results);
-    for (let i of results) {
-      // console.log(i);
-      let listCharacters = i.characters;
-      //  console.log(listCharacters);
-      for (let j in listCharacters) {
-        // console.log(listCharacters[j]);
-        if (charId.test(listCharacters[j]) === true) {
-          count++;
+const argv = process.argv;
+// const url = 'http://swapi.co/api/films/';
+
+function getJson (theUrl) {
+  const options = {
+    url: theUrl,
+    method: 'GET',
+    headers: {
+      Accept: 'application/json',
+      'Accept-Charset': 'utf-8'
+    }
+  };
+  request(options, function (err, res, body) {
+    if (err) {
+      console.log(err);
+    } else {
+      const json = JSON.parse(body);
+      // const status = res.statusCode;
+      // console.log(json);
+      const data = json;
+      let count = 0;
+      const results = data.results;
+
+      for (const i in results) {
+        const characters = results[i].characters;
+        for (const j in characters) {
+          if (characters[j].indexOf('/18/') >= 0) {
+            count += 1;
+          }
         }
       }
+      console.log(count);
+      return json;
     }
-  }
-  console.log(count);
-});
-
-/*
-Okay this works but the intranet and grader is a butt
-request(charId, function (error, response, body) {
-if (error) {
-console.log(error);
-} else {
-const val = JSON.parse(body);
-console.log(val.films.length);
+  });
 }
-});
-*/
+
+getJson(argv[2]);
