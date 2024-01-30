@@ -1,52 +1,30 @@
 #!/usr/bin/node
 
 const request = require('request');
-const argv = process.argv;
-const url = 'http://swapi.co/api/films/' + argv[2];
-
-function getcharacter (theUrl) {
-  const options = {
-    url: theUrl,
-    method: 'GET',
-    headers: {
-      Accept: 'application/json',
-      'Accept-Charset': 'utf-8'
+const endpoint = 'https://swapi-api.hbtn.io/api/films/';
+const filter = process.argv[2];
+const url = endpoint + filter;
+const listx = [];
+const listname = [];
+let count = 0;
+request(url, function (error, response, body) {
+  if (error) { return console.log(error); } else {
+    for (let m = 0; m < JSON.parse(body).characters.length; m++) {
+      listx.push(JSON.parse(body).characters[m]);
     }
-  };
-  request(options, function (err, res, body) {
-    if (err) {
-      console.log(err);
-    } else {
-      const json = JSON.parse(body);
-      // const status = res.statusCode;
-      // console.log(json);
-      console.log(json.name);
-    }
-  });
-}
-
-function getJson (theUrl) {
-  const options = {
-    url: theUrl,
-    method: 'GET',
-    headers: {
-      Accept: 'application/json',
-      'Accept-Charset': 'utf-8'
-    }
-  };
-  request(options, function (err, res, body) {
-    if (err) {
-      console.log(err);
-    } else {
-      const json = JSON.parse(body);
-      // const status = res.statusCode;
-      // console.log(json);
-      const characters = json.characters;
-      for (const i in characters) {
-        getcharacter(characters[i]);
+  }
+  for (let k = 0; k < listx.length; k++) {
+    request(listx[k], function (e, r, b) {
+      if (e) { return console.log(e); }
+      listname.push(JSON.parse(b).name);
+      // console.log(JSON.parse(b).name);
+      // console.log(listname);
+      count++;
+      if (count === listx.length) {
+        for (let x = 0; x < listname.length; x++) { console.log(listname[x]); }
       }
-      return json;
-    }
-  });
-}
-getJson(url);
+    // console.log(listname);}
+    });
+    // console.log(listname);
+  }
+});
