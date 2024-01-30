@@ -1,43 +1,32 @@
 #!/usr/bin/node
-const process = require('process');
+
 const request = require('request');
-let order = [];
-let responses = {};
-
-function getCharName (charUrl) {
-  let val;
-  val = request(charUrl, function (error, response, body) {
-    if (error != null) {
-      console.log(error);
-    } else {
-      let data = JSON.parse(body);
-      val = data['name'];
-      responses[charUrl] = val;
+const url = 'http://swapi.co/api/films/' + process.argv[2];
+request(url, function (error, response, body) {
+  if (error) {
+    console.log(error);
+  } else {
+    let data = JSON.parse(body).characters;
+    // console.log(data);
+    let order = [];
+    for (let i = 0; i < data.length; i++) {
+      order.push(new Promise(function (resolve, reject) {
+        request.get(data[i], function (error, response, body) {
+          if (error) {
+            reject(error);
+          }
+          resolve(JSON.parse(body).name);
+        });
+      }));
+      // console.log(order[i]);
     }
-  });
-}
-
-function doParse () {
-  let movie = process.argv[2];
-  let url = 'https://swapi.co/api/films/' + movie;
-
-  request(url, function (error, response, body) {
-    if (error != null) {
-      console.log(error);
-    } else {
-      let data = JSON.parse(body);
-      data['characters'].forEach(function (charUrl) {
-        order.push(charUrl);
-        getCharName(charUrl);
-      });
-    }
-  });
-}
-
-doParse();
-setTimeout(function () {
-  // some stuff
-  order.forEach(function (url) {
-    console.log(responses[url]);
-  });
-}, 5000);
+    Promise.all(order).then(character => {
+      for (let j = 0; j < character.length; j++) {
+        console.log(character[j]);
+      }
+      // can shorten above 2 lines into this 1 line below
+      // character.forEach(person => console.log(person));
+    });
+    // console.log(order);
+  }
+});
